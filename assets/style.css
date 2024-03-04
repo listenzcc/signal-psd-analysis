@@ -1,0 +1,13 @@
+.flexLayout {
+    display: flex;
+}
+
+.narrowDiv {
+    width: 400px;
+    margin: 10px
+}
+
+.wideDiv {
+    width: 600px;
+    margin: 10px
+}
