@@ -41,7 +41,7 @@ def compute_fft(x: np.ndarray) -> dict:
     A = fft.fft(x, 2048) / n
     freq = np.linspace(-0.5, 0.5, A.shape[-1])
     response = np.abs(fft.fftshift(A / np.max(np.abs(A))))
-    # response = 20 * np.log10(np.maximum(response, 1e-10))
+    response = 20 * np.log10(np.maximum(response, 1e-10))
     return dict(response=response, freq=freq)
 
 
@@ -51,19 +51,24 @@ names = get_window_names()
 
 fig, axs = plt.subplots(2, 1, figsize=(8, 6))
 
-plt.style.use("seaborn")
+plt.style.use("ggplot")
 
+array = []
 for name in names:
     try:
         window = get_window_shape(name)
         dct = compute_fft(window)
+        for j, w in enumerate(window):
+            array.append(dict(name=name, amplitude=w, time=j, data_type="temporal"))
+        for resp, freq in zip(dct["response"], dct["freq"]):
+            array.append(dict(name=name, resp=resp, freq=freq, data_type="spectral"))
     except ValueError:
         pass
 
     axs[0].plot(window, alpha=0.6, label=name)
-    axs[1].semilogy(dct["freq"], dct["response"], alpha=0.6, label=name)
+    axs[1].plot(dct["freq"], dct["response"], alpha=0.6, label=name)
 
-axs[1].set_ylim([1e-8, 1])
+# axs[1].set_ylim([1e-8, 1])
 axs[0].set_title("Frequency responses of the windows")
 axs[0].set_ylabel("Amplitude")
 axs[1].set_ylabel("Normalized magnitude [dB]")
@@ -72,6 +77,11 @@ axs[1].set_xlabel("Normalized frequency [cycles per sample]")
 plt.tight_layout()
 plt.show()
 
+import pandas as pd
+
+df = pd.DataFrame(array)
+df.to_json("frequency-responses-of-the-windows.json")
+fig.savefig("frequency-responses-of-the-windows.jpg")
 
 # %% ---- 2024-03-04 ------------------------
 # Pending
