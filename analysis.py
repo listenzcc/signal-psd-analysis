@@ -75,7 +75,7 @@ lanczos
 
 
 def compute_psd(window: str = "hann", **kwargs):
-    data = load_data(Path("data/4hz/S0.mat"))
+    data = load_data(Path("data/10hz/S0.mat"))
     print(kwargs)
     f, Pxx_den = signal.welch(data, fs, window, **kwargs)
     df = mk_df(Pxx_den, ch_names, f)
